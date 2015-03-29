@@ -4,68 +4,106 @@
 ''' 3. Write a class PolynomialSolver that solves for roots of polynomials with bisection search method BisectionSearch(), Secant method Secant() (and its variant RgulaFalsi method SecantRF()) and Newton-Raphson method NewtonRaphson().  '''
 
 # Solution
-
-
+import random
+import matplotlib.pyplot as plt
+import numpy as np
 class PolynomialSolver:
-	def Func(self,n,L,value):
-		k=0
-		for i in range(n+1):
-			k+=L[i]*(value**i)
-		return k
-	def Func_deriv(self,n,L,value):
-		k=0
-		for i in range(1,n+1):
-			k+=i*L[i]*(value**(i-1))
-		return k
-	def solve(self,n,L,method):
-		if(method=='bisection'):
-			lower=int(input("Input the lower bound of interval in which root lies :"))
-			upper=int(input("Input the upper bound of interval in which root lies :"))
-			it=int(input("Input the maximum number of itertions :"))
-			while(abs(self.Func(n,L,lower)-self.Func(n,L,upper))>0.00001 and it>0):
-				m=(lower+upper)/2
-				if(self.Func(n,L,lower)*self.Func(n,L,m)<0):
-					upper=m
-				else:
-					lower=m
-				print (lower,upper,self.Func(n,L,lower),self.Func(n,L,u))
-				it-=1
-			return([lower,upper])
-		if(method=='secant'):
-			lower=int(input("Input the lower bound of interval in which root lies :"))
-			upper=int(input("Input the upper bound of interval in which root lies :"))
-			it=int(input("Input the maximum number of itertions :"))
-			while(abs(self.Func(n,L,lower))>0.00001 and it>0):
-				func1=self.Func(n,L,lower)
-				func2=self.Func(n,L,upper)
-				lower,upper=upper,upper-(((upper-lower)*func2)/(func2-func1))
-				print("the lower,upper,function1 and function2 are respectively :")
-				print (lower,upper,func1,func2)
-				it-=1
-			return(lower)
-		if(method=='secantRF'):
-			lower=int(input("Input the lower bound of interval in which root lies :"))
-			upper=int(input("Input the upper bound of interval in which root lies :"))
-			m=lower
-			it=int(input("Input the maximum number of itertions :"))
-			while(abs(self.Func(n,L,m))>0.00001 and it>0):
-				func1=self.Func(n,L,lower)
-				func2=self.Func(n,L,upper)
-				m=upper-(((upper-lower)*func2)/(func2-func1))
-				fm=self.Func(n,L,m)
-				if(func1*fm<0):
-					upper=m
-				else:
-					lower=m
-				print (m)
-				it-=1
-			return(lower)
-		if(method=='newtonraphson'):
-			lower=int(input("Input the lower bound of interval in which root lies"))
-			
-			it=int(input("Input the maximum number of itertions"))
-			while(abs(self.Func(n,L,lower))>0.00001 and it>0):
-				lower=lower-self.Func(n,L,lower)/self.Func_deriv(n,L,lower)
-			return(lower)
-		else:
-			return None
+    def Func(self,n,L,value):
+            k=0
+            for i in range(n+1):
+                    k+=L[i]*(value**i)
+            return k
+    def Func_deriv(self,n,L,value):
+            k=0
+            for i in range(1,n+1):
+                    k+=i*L[i]*(value**(i-1))
+            return k
+    def solve(self,n,L,method):
+            if(method=='bisection'):
+                    lower=float(input("Input the lower bound of interval in which root lies :"))
+                    upper=float(input("Input the upper bound of interval in which root lies :"))
+                    it=int(input("Input the maximum number of itertions :"))
+                    Tol=float(input("Input the tolerence"))
+                    x=np.linspace(lower-1,upper+1,100)
+                    y=[self.Func(n,L,i) for i in x]
+                    plt.plot(x,y,color='b')
+                    y=y=[0 for i in x]
+                    plt.plot(x,y,color='r')
+                    plt.annotate('X-AXIS',xy=(x[45],y[45]-5),xytext=(x[45],y[45]-5))
+                    plt.annotate('Bisection Method',xy=(x[0],self.Func(n,L,x[99])),xytext=(x[0],self.Func(n,L,x[99])))
+                    plt.ylabel('Y-AXIS')
+                     
+                    while(abs(self.Func(n,L,lower)-self.Func(n,L,upper))>Tol and it>0):
+                        r = lambda: random.randint(0,255)
+                        colr='#%02X%02X%02X' % (r(),r(),r())
+                        
+                        plt.plot([lower,lower],[self.Func(n,L,lower), 0],'-',color=colr)
+                        plt.plot([upper,upper],[self.Func(n,L,upper),0],'-',color=colr) 
+                        m=(lower+upper)/2
+                        if(self.Func(n,L,lower)*self.Func(n,L,m)<0):
+                                upper=m
+                        elif((self.Func(n,L,lower)*self.Func(n,L,m))==0): 
+                                if (self.Func(n,L,lower)==0):
+                                    upper=lower+Tol
+                                    lower=lower-Tol
+                                else:
+                                    lower=m-Tol
+                                    upper=m+Tol
+##                                print (lower,upper,self.Func(n,L,lower),self.Func(n,L,upper))
+                                 
+                                plt.plot([lower,lower],[self.Func(n,L,lower),0],'-',color=colr)
+                                plt.plot([upper,upper],[self.Func(n,L,upper),0],'-',color=colr) 
+                                break   
+                        else:
+                                lower=m
+                        colr='#%02X%02X%02X' % (r(),r(),r())         
+                        plt.plot([lower,lower],[self.Func(n,L,lower), 0],'-',color=colr)
+                        plt.plot([upper,upper],[self.Func(n,L,upper),0],'-',color=colr)        
+##                        print (lower,upper,self.Func(n,L,lower),self.Func(n,L,upper))
+                        it-=1
+                    plt.show()    
+                    return([lower,upper])
+            if(method=='secant'):
+                    lower=int(input("Input the lower bound of interval in which root lies :"))
+                    upper=int(input("Input the upper bound of interval in which root lies :"))
+                    it=int(input("Input the maximum number of itertions :"))
+                    while(abs(self.Func(n,L,lower))>Tol and it>0):
+                            func1=self.Func(n,L,lower)
+                            func2=self.Func(n,L,upper)
+                            lower,upper=upper,upper-(((upper-lower)*func2)/(func2-func1))
+                            print("the lower,upper,function1 and function2 are respectively :")
+                            print (lower,upper,func1,func2)
+                            it-=1
+                    return(lower)
+            if(method=='secantRF'):
+                    lower=int(input("Input the lower bound of interval in which root lies :"))
+                    upper=int(input("Input the upper bound of interval in which root lies :"))
+                    m=lower
+                    it=int(input("Input the maximum number of itertions :"))
+                    while(abs(self.Func(n,L,m))>Tol and it>0):
+                            func1=self.Func(n,L,lower)
+                            func2=self.Func(n,L,upper)
+                            m=upper-(((upper-lower)*func2)/(func2-func1))
+                            fm=self.Func(n,L,m)
+                            if(func1*fm<0):
+                                    upper=m
+                            else:
+                                    lower=m
+                            print (m)
+                            it-=1
+                    return(lower)
+            if(method=='newtonraphson'):
+                    lower=int(input("Input the lower bound of interval in which root lies"))
+                    
+                    it=int(input("Input the maximum number of itertions"))
+                    while(abs(self.Func(n,L,lower))>Tol and it>0):
+                            lower=lower-self.Func(n,L,lower)/self.Func_deriv(n,L,lower)
+                    return(lower)
+            else:
+                    return None
+method=['bisection','secant','secantRF','newtonraphson']
+p=PolynomialSolver()
+
+for i in method:
+         print (p.solve(2,[20,-12,1],i))
+ 
